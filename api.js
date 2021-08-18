@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const token = process.env.TOKEN;
 
-const BASE_URL = "https://api.swyftx.com.au";
+const BASE_URL = "https://api.demo.swyftx.com.au";
 
 /* GET request to Swyftx API for account balances. */
 export const getBalances = async () => {
@@ -23,4 +23,31 @@ export const getMarketPrice = async () => {
   const endpoint = BASE_URL + "/live-rates/36/";
   const rates = await fetch(endpoint).then((res) => res.json());
   return rates["3"]["midPrice"];
+};
+
+/*
+  1. Calculate amount to sell.
+  2. POST request to Swyftx API to do a SELL operation.
+*/
+export const placeSellOrder = async () => {
+  const balances = await getBalances();
+  const BTC = balances.find((asset) => asset.assetId === 3).availableBalance;
+  const sellAmount = 0.5 * BTC;
+
+  const endpoint = BASE_URL + "/orders/";
+  const order = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      primary: "USD",
+      secondary: "BTC",
+      quantity: sellAmount,
+      assetQuantity: "BTC",
+      orderType: 2,
+    }),
+  }).then((res) => res.json());
+  return order.order.rate;
 };
