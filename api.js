@@ -51,3 +51,30 @@ export const placeSellOrder = async () => {
   }).then((res) => res.json());
   return order.order.rate;
 };
+
+/*
+  1. Calculate amount to buy.
+  2. POST request to Swyftx API to do a BUY operation.
+*/
+export const placeBuyOrder = async () => {
+  const balances = await getBalances();
+  const USD = balances.find((asset) => asset.assetId === 36).availableBalance;
+  const buyAmount = 0.5 * USD;
+
+  const endpoint = BASE_URL + "/orders/";
+  const order = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      primary: "USD",
+      secondary: "BTC",
+      quantity: buyAmount,
+      assetQuantity: "USD",
+      orderType: 1,
+    }),
+  }).then((res) => res.json());
+  return order.order.rate;
+};
