@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import dotenv from "dotenv";
 
 dotenv.config();
-const token = process.env.TOKEN;
+const token = process.env.SWYFTX_TOKEN;
 
 const BASE_URL = "https://api.demo.swyftx.com.au";
 
